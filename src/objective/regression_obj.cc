@@ -254,7 +254,7 @@ class GammaRegression : public ObjFunction {
         label_correct = false;
       }
     }
-    CHECK(label_correct) << "PoissonRegression: label must be nonnegative";
+    CHECK(label_correct) << "GammaRegression: label must be positive";
   }
   void PredTransform(std::vector<float> *io_preds) override {
     std::vector<float> &preds = *io_preds;
@@ -282,7 +282,7 @@ class GammaRegression : public ObjFunction {
 DMLC_REGISTER_PARAMETER(GammaRegressionParam);
 
 XGBOOST_REGISTER_OBJECTIVE(GammaRegression, "reg:gamma")
-.describe("Possion regression for severity data.")
+.describe("Gamma regression for severity data.")
 .set_body([]() { return new GammaRegression(); });
 }  // namespace obj
 }  // namespace xgboost
