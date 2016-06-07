@@ -223,8 +223,8 @@ struct GammaRegressionParam : public dmlc::Parameter<GammaRegressionParam> {
   float shape_of_gamma;
   DMLC_DECLARE_PARAMETER(GammaRegressionParam) {
     DMLC_DECLARE_FIELD(shape_of_gamma).set_lower_bound(0.001f)
-        .describe("Maximum delta step we allow each weight estimation to be." \
-                  " This parameter is required for possion regression.");
+        .describe("The shape parameter of gamma distribution." \
+                  " This parameter is required for gamma regression.");
   }
 };
 
