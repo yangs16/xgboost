@@ -220,7 +220,11 @@ XGBOOST_REGISTER_OBJECTIVE(PoissonRegression, "count:poisson")
 
 // declare parameter
 struct GammaRegressionParam : public dmlc::Parameter<GammaRegressionParam> {
+  float shape_of_gamma;
   DMLC_DECLARE_PARAMETER(GammaRegressionParam) {
+    DMLC_DECLARE_FIELD(shape_of_gamma).set_lower_bound(0.001f)
+        .describe("Maximum delta step we allow each weight estimation to be." \
+                  " This parameter is required for possion regression.");
   }
 };
 
@@ -249,7 +253,8 @@ class GammaRegression : public ObjFunction {
       float w = info.GetWeight(i);
       float y = info.labels[i];
       if (y >= 0.0f) {
-        out_gpair->at(i) = bst_gpair((1 - y / std::exp(p)) * w, y / std::exp(p) * w);
+        out_gpair->at(i) = bst_gpair((1 - y / std::exp(p)) * param_.shape_of_gamma * w,
+                                     y / std::exp(p) * param_.shape_of_gamma * w);
       } else {
         label_correct = false;
       }

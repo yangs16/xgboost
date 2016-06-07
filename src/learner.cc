@@ -168,6 +168,12 @@ class LearnerImpl : public Learner {
       cfg_["max_delta_step"] = "0.7";
     }
 
+    if (cfg_.count("shape_of_gamma") == 0 &&
+        cfg_.count("objective") != 0 &&
+        cfg_["objective"] == "reg:gamma") {
+      cfg_["shape_of_gamma"] = "0.1";
+    }
+
     if (cfg_.count("updater") == 0) {
       if (tparam.dsplit == 1) {
         cfg_["updater"] = "distcol";
