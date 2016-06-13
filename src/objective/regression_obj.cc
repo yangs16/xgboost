@@ -221,10 +221,12 @@ XGBOOST_REGISTER_OBJECTIVE(PoissonRegression, "count:poisson")
 // declare parameter
 struct GammaRegressionParam : public dmlc::Parameter<GammaRegressionParam> {
   float shape_of_gamma;
+  float lp_bias;
   DMLC_DECLARE_PARAMETER(GammaRegressionParam) {
     DMLC_DECLARE_FIELD(shape_of_gamma).set_lower_bound(0.001f)
-        .describe("The shape parameter of gamma distribution." \
-                  " This parameter is required for gamma regression.");
+        .describe("The shape parameter of gamma distribution.");
+    DMLC_DECLARE_FIELD(lp_bias).set_lower_bound(0.0f)
+        .describe("The bias for the untransformed prediction.");
   }
 };
 
@@ -253,8 +255,8 @@ class GammaRegression : public ObjFunction {
       float w = info.GetWeight(i);
       float y = info.labels[i];
       if (y >= 0.0f) {
-        out_gpair->at(i) = bst_gpair((1 - y / std::exp(p)) * param_.shape_of_gamma * w,
-                                     y / std::exp(p) * param_.shape_of_gamma * w);
+        out_gpair->at(i) = bst_gpair((1 - y / std::exp(p + param_.lp_bias)) * param_.shape_of_gamma * w,
+                                     y / std::exp(p + param_.lp_bias) * param_.shape_of_gamma * w);
       } else {
         label_correct = false;
       }

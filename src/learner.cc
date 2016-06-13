@@ -171,7 +171,13 @@ class LearnerImpl : public Learner {
     if (cfg_.count("shape_of_gamma") == 0 &&
         cfg_.count("objective") != 0 &&
         cfg_["objective"] == "reg:gamma") {
-      cfg_["shape_of_gamma"] = "0.1";
+      cfg_["shape_of_gamma"] = "1.0";
+    }
+
+    if (cfg_.count("lp_bias") == 0 &&
+        cfg_.count("objective") != 0 &&
+        cfg_["objective"] == "reg:gamma") {
+      cfg_["lp_bias"] = "0.0";
     }
 
     if (cfg_.count("updater") == 0) {
