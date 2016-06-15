@@ -183,7 +183,7 @@ struct EvalEWiseBase2 : public Metric {
     if (distributed) {
       rabit::Allreduce<rabit::op::Sum>(dat, 2);
     }
-    double dispersion = sum / (wsum - info.num_col);
+    double dispersion = dat[0] / (dat[1] - info.num_col);
 
     // Computer metric
     sum = 0.0, wsum = 0.0;
