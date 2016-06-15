@@ -265,7 +265,7 @@ class GammaRegression : public ObjFunction {
     const long ndata = static_cast<long>(preds.size()); // NOLINT(*)
     #pragma omp parallel for schedule(static)
     for (long j = 0; j < ndata; ++j) {  // NOLINT(*)
-      preds[j] = std::exp(preds[j]);
+      preds[j] = std::exp(preds[j] + param_.lp_bias);
     }
   }
   void EvalTransform(std::vector<float> *io_preds) override {
