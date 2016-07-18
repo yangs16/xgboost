@@ -61,7 +61,7 @@ struct EvalEWiseBase : public Metric {
 
 struct EvalGDeviance : public EvalEWiseBase<EvalGDeviance> {
   const char *Name() const override {
-    return "gamma-deviance";
+    return "g-deviance";
   }
   inline float EvalRow(float label, float pred) const {
     float epsilon = 1.0e-9;
@@ -70,7 +70,24 @@ struct EvalGDeviance : public EvalEWiseBase<EvalGDeviance> {
   }
   inline static float GetFinal(float esum, float wsum) {
     //return esum / wsum;
-    return esum;
+    return 2 * esum;
+  }
+};
+
+struct EvalGNLogLik: public EvalEWiseBase<EvalGNLogLik> {
+  const char *Name() const override {
+    return "g-nloglik";
+  }
+  inline float EvalRow(float y, float py) const {
+    float psi = 1.0;
+    float theta = -1. / py;
+    float a = psi;
+    float b = -std::log(-theta);
+    float c = 1. / psi * std::log(y/psi) - std::log(y) - common::LogGamma(1. / psi);
+    return -((y * theta - b) / a + c);
+  }
+  inline static float GetFinal(float esum, float wsum) {
+    return esum / wsum;
   }
 };
 
@@ -150,9 +167,13 @@ struct EvalPoissionNegLogLik : public EvalEWiseBase<EvalPoissionNegLogLik> {
   }
 };
 
-XGBOOST_REGISTER_METRIC(GammaDeviance, "gamma-deviance")
+XGBOOST_REGISTER_METRIC(GammaDeviance, "g-deviance")
 .describe("Gamma deviance.")
 .set_body([](const char* param) { return new EvalGDeviance(); });
+
+XGBOOST_REGISTER_METRIC(GammaNLogLik, "g-nloglik")
+.describe("Gamma negative log-likelihood.")
+.set_body([](const char* param) { return new EvalGNLogLik(); });
 
 XGBOOST_REGISTER_METRIC(RMSE, "rmse")
 .describe("Rooted mean square error.")
@@ -241,6 +262,7 @@ struct EvalGammaNegLogLik : public EvalEWiseBase2<EvalGammaNegLogLik> {
     return "gamma-nloglik";
   }
   inline float EvalRow(float y, float py, float psi) const {
+    psi = 1.0;
     double theta = -1. / py;
     double a = psi;
     double b = -std::log(-theta);
